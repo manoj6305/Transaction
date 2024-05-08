@@ -1,150 +1,75 @@
 import React, { useState } from 'react';
-import { Table, Space, Input, Form, Button, Modal, Popconfirm, Row, Col,Typography } from 'antd';
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import TransactionSeed from './TransactionSeed';
+import { Form, Input, Select, DatePicker, Button } from 'antd';
 
-const {Title} = Typography;
-const { Search } = Input;
+const { Option } = Select;
 
 const TransactionForm = () => {
-  const [dataSource, setDataSource] = useState(TransactionSeed);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [editedRecord, setEditedRecord] = useState(null);
-  const [searchedData, setSearchedData] = useState(null);
+  const [formData, setFormData] = useState({
+    id: '',
+    itemName: '',
+    description: '',
+    category: 'food',
+    dateOfPayment: null,
+    transactionMode: 'cash',
+  });
 
-  const showModal = (record) => {
-    setEditedRecord(record);
-    setIsModalVisible(true);
+  const handleChange = (fieldName, value) => {
+    setFormData({ ...formData, [fieldName]: value });
   };
 
-  const handleCancel = () => {
-    setIsModalVisible(false);
-  };
-
-  const handleUpdate = () => {
-    const index = dataSource.findIndex((item) => item.key === editedRecord.key);
-    if (index !== -1) {
-      const updatedDataSource = [...dataSource];
-      updatedDataSource[index] = editedRecord;
-      setDataSource(updatedDataSource);
-    }
-
-    setIsModalVisible(false);
-  };
-
-  const handleInputChange = (fieldName, value) => {
-    setEditedRecord((prevRecord) => ({
-      ...prevRecord,
-      [fieldName]: value,
-    }));
-  };
-
-  const onDelete = (prop) => {
-    const updatedData = dataSource.filter((item) => item.Id !== prop);
-    setDataSource(updatedData);
-  };
-
-  const columns = [
-    { title: 'Id', dataIndex: 'Id', key: 'Id', fixed: 'left', width: 40 },
-    { title: 'itemName', dataIndex: 'itemName', key: 'itemName', width: 90 },
-    { title: 'description', dataIndex: 'description', key: 'description', responsive: ['lg'] },
-    { title: 'category', dataIndex: 'category', key: 'category', width: 150 },
-    { title: 'dateOfPayment', dataIndex: 'dateOfPayment', key: 'dateOfPayment', width: 150 },
-    { title: 'amount', dataIndex: 'amount', key: 'amount', width: 70 },
-    { title: 'modeOfPayment', dataIndex: 'modeOfPayment', key: 'modeOfPayment', width: 130 },
-    { title: 'transactionMode', dataIndex: 'transactionMode', key: 'transactionMode', width: 130 },
-    {
-      title: 'Action',
-      dataIndex: 'Action',
-      fixed: 'right',
-      width: 60,
-      render: (_, record) => (
-        <Space size="middle">
-          <a type="link" onClick={() => showModal(record)}>
-            <EditOutlined />
-          </a>
-          <Popconfirm title="Sure to delete" onConfirm={() => onDelete(record.Id)}>
-            <a><DeleteOutlined /></a>
-          </Popconfirm>
-        </Space>
-      ),
-    },
-  ];
-
-  const onChange = (e) => {
-    const value = e.target.value.toLowerCase();
-    const filteredData = dataSource.filter(
-      (item) => item.itemName.toLowerCase().includes(value)
-    );
-    setSearchedData(filteredData);
+  const onFinish = () => {
+    console.log('Form data:', formData);
+    // You can handle form submission logic here
   };
 
   return (
-    <div>
-      <Row style={{ padding: '10px' }}>
-        <Col span={5} offset={1}><strong>Transaction History</strong></Col>
-        <Col span={8} offset={10} ><Search placeholder="Search" enterButton onChange={onChange} style={{justifyContent:'center', alignItems:'center'}}/></Col>
-      </Row>
-      <Table columns={columns} dataSource={searchedData || dataSource} scroll={{ x: 1300, y: 320 }} bordered size="small" pagination={{ pageSize: 5 }} />
-      <Modal
-        title="Edit Record"
-        visible={isModalVisible}
-        onCancel={handleCancel}
-        footer={[
-          <Button key="cancel" onClick={handleCancel}>
-            Cancel
-          </Button>,
-          <Button key="update" type="primary" onClick={handleUpdate}>
-            Update
-          </Button>,
-        ]}
-      >
-        <Form>
-          <Form.Item label="itemName">
-            <Input
-              value={editedRecord?.itemName}
-              onChange={(e) => handleInputChange('itemName', e.target.value)}
-            />
-          </Form.Item>
-          <Form.Item label="description">
-            <Input
-              value={editedRecord?.description}
-              onChange={(e) => handleInputChange('description', e.target.value)}
-            />
-          </Form.Item>
-          <Form.Item label="category">
-            <Input
-              value={editedRecord?.category}
-              onChange={(e) => handleInputChange('category', e.target.value)}
-            />
-          </Form.Item>
-          <Form.Item label="dateOfPayment">
-            <Input
-              value={editedRecord?.dateOfPayment}
-              onChange={(e) => handleInputChange('dateOfPayment', e.target.value)}
-            />
-          </Form.Item>
-          <Form.Item label="amount">
-            <Input
-              value={editedRecord?.amount}
-              onChange={(e) => handleInputChange('amount', e.target.value)}
-            />
-          </Form.Item>
-          <Form.Item label="modeOfPayment">
-            <Input
-              value={editedRecord?.modeOfPayment}
-              onChange={(e) => handleInputChange('modeOfPayment', e.target.value)}
-            />
-          </Form.Item>
-          <Form.Item label="transactionMode">
-            <Input
-              value={editedRecord?.transactionMode}
-              onChange={(e) => handleInputChange('transactionMode', e.target.value)}
-            />
-          </Form.Item>
-        </Form>
-      </Modal>
-    </div>
+    <Form
+      name="transaction_form"
+      onFinish={onFinish}
+      labelCol={{ span: 8 }}
+      wrapperCol={{ span: 16 }}
+    >
+      <Form.Item label="ID">
+        <Input onChange={(e) => handleChange('id', e.target.value)} />
+      </Form.Item>
+
+      <Form.Item label="Item Name">
+        <Input onChange={(e) => handleChange('itemName', e.target.value)} />
+      </Form.Item>
+
+      <Form.Item label="Description">
+        <Input.TextArea onChange={(e) => handleChange('description', e.target.value)} />
+      </Form.Item>
+
+      <Form.Item label="Category">
+        <Select onChange={(value) => handleChange('category', value)}>
+          <Option value="food">Food</Option>
+          <Option value="clothing">Clothing</Option>
+          <Option value="electronics">Electronics</Option>
+          <Option value="other">Other</Option>
+        </Select>
+      </Form.Item>
+
+      <Form.Item label="Date of Payment">
+        <DatePicker onChange={(date) => handleChange('dateOfPayment', date)} />
+      </Form.Item>
+
+      <Form.Item label="Transaction Mode">
+        <Select onChange={(value) => handleChange('transactionMode', value)}>
+          <Option value="cash">Cash</Option>
+          <Option value="credit_card">Credit Card</Option>
+          <Option value="debit_card">Debit Card</Option>
+          <Option value="online">Online</Option>
+          <Option value="other">Other</Option>
+        </Select>
+      </Form.Item>
+
+      <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+        <Button type="primary" htmlType="submit">
+          Submit
+        </Button>
+      </Form.Item>
+    </Form>
   );
 };
 

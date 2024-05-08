@@ -1,26 +1,18 @@
-import React,{useState,useRef} from 'react';
-import './App.css';
-import Form from './Form';
-import { Switch, Upload, Button, Slider, message} from 'antd';
+import React, { useState } from "react";
+import { Form, Input, Button, Switch, Upload, Slider } from "antd";
 import { UploadOutlined } from '@ant-design/icons';
 
-  
-  const App = () => {
-    const [isToggleOn, setIsToggleOn] = useState(false);
-    const [isToggleDisabled, setIsToggleDisabled] = useState(false);
-    const [isSliderDisabled, setIsSliderDisabled] = useState(false);
-
-    const handleButtonClick = () => {
-      setIsToggleDisabled(!isToggleDisabled); 
-    };
-    const formRef = useRef();
-
+const Forms = () => {
+  const [isToggleOn, setIsToggleOn] = useState(true);
+  const [isToggleDisabled, setIsToggleDisabled] = useState(false);
+  const [isSliderDisabled, setIsSliderDisabled] = useState(false);
 
   const formItems = [
     {
       label: "Toggle",
       name: "toggle",
-      rules: [{ message:'please check the toggle' },],
+      rules: [{ required: true },
+        { type: "boolean", message: "Please select a valid value" }],
       render: () => <Switch disabled={isToggleDisabled} checked={isToggleOn} onChange={(checked) => setIsToggleOn(checked)}  />,
     },
     {
@@ -36,23 +28,23 @@ import { UploadOutlined } from '@ant-design/icons';
     {
       label: "File Upload",
       name: "file",
-      rules: [{ required: true, message: 'Please upload the file' }],
       render: () => (
         <Upload>
           <Button icon={<UploadOutlined />}>Click to Upload</Button>
         </Upload>
       ),
     },
+    
+
     {
       label:'Toggle2',
       name:'toggle2' ,
-      rules: [{ required: true, message: 'Please upload the file' }],
       render: () => <Switch checkedChildren='Yes' unCheckedChildren='No'/>,
     },
     {
       label:'Toggle3',
       name:'toggle3',
-      render: () => <Switch loading={true}  />,
+      render: () => <Switch loading={false}  disabled={false}/>,
     },
     {
       label: "Slider",
@@ -75,14 +67,29 @@ import { UploadOutlined } from '@ant-design/icons';
       ),
     },
   ];
-  
+
+  const handleButtonClick = () => {
+    setIsToggleDisabled(!isToggleDisabled); // Toggle the disabled state of the switch
+  };
+
+  const onFinish = (values) => {
+    console.log("Received values:", values);
+  };
+
   return (
-    <div >
-
-      <Form formItems={formItems} formRef={formRef}/>
-
-    </div>
+    <Form onFinish={onFinish}>
+      {formItems.map((item, index) => (
+        <Form.Item
+          key={index}
+          label={item.label}
+          name={item.name}
+          rules={item.rules}
+        >
+          {item.render()}
+        </Form.Item>
+      ))}
+    </Form>
   );
-}
+};
 
-export default App;
+export default Forms;
